@@ -5,7 +5,18 @@ const base_uri = '/assistant/level'
 function getLevel() {
   return request.post(base_uri + '/levels')
 }
-
+//  根据父级id查询该父级id下的所有子级数据
+function getLevelByParentId(parentId) {
+  return request.post(base_uri + '/getByParentId', {
+    parentId: parentId
+  })
+}
+//  根据id获取数据
+function get(id) {
+  return request.post(base_uri + '/get', {
+    id: id
+  })
+}
 /**
  * 保存数据
  */
@@ -19,5 +30,7 @@ function save(editFormData) {
 // 导出数据结果
 export default {
   getLevel,
-  save
+  save,
+  getLevelByParentId,
+  get
 }
