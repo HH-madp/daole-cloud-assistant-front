@@ -81,7 +81,7 @@
   </div>
 </template>
 <script>
-import assistanrApi from '@/api/assistant'
+import levelApi from '@/api/level'
 
 export default {
   data() {
@@ -139,7 +139,7 @@ export default {
       if (!value) return true
       return data.label.indexOf(value) !== -1
     },
-    // 树的单选框选择事件
+    // 树的点击事件
     treeCheck(data) {
       // 选择单选框创建子集菜单时，form表单的parentId为当前选择项的id
       this.form.parentId = data.id
@@ -148,7 +148,7 @@ export default {
     },
     // 获取所有节点信息
     getLevels() {
-      assistanrApi.getLevel().then(res => {
+      levelApi.getLevel().then(res => {
         if (res.msg === 'success') {
           this.treeData = res.data
         }
@@ -156,7 +156,7 @@ export default {
     },
     // 根据父节点id获取该节点下的菜单数据
     getLevelsByParentId(pageNum, pageSize, parentId) {
-      assistanrApi.getLevelByParentId(pageNum, pageSize, parentId).then(res => {
+      levelApi.getLevelByParentId(pageNum, pageSize, parentId).then(res => {
         if (res.msg === 'success') {
           this.pageData.datalist = res.data.records
           this.pageData.pagenum = res.data.current
@@ -168,7 +168,7 @@ export default {
     },
     // 分页按钮点击事件
     handlePageNumChange(val) {
-      assistanrApi.getLevelByParentId(val, this.pageData.pagesize, 0).then(res => {
+      levelApi.getLevelByParentId(val, this.pageData.pagesize, 0).then(res => {
         if (res.msg === 'success') {
           this.pageData.datalist = res.data.records
           this.pageData.pagenum = res.data.pages
@@ -192,7 +192,7 @@ export default {
     },
     // 一级菜单保存数据
     handleSave() {
-      assistanrApi.save(this.form).then(res => {
+      levelApi.save(this.form).then(res => {
         if (res.msg === 'success') {
           this.$notify({
             title: '成功',
@@ -218,7 +218,7 @@ export default {
     },
     // 子级菜单保存数据
     handleChildSave() {
-      assistanrApi.save(this.form).then(res => {
+      levelApi.save(this.form).then(res => {
         if (res.msg === 'success') {
           this.$notify({
             title: '成功',
@@ -250,7 +250,7 @@ export default {
     },
     // 根据id获取当前列的数据
     get(id) {
-      assistanrApi.get(id).then(res => {
+      levelApi.get(id).then(res => {
         if (res.msg === 'success') {
           if (res.data.length > 0) {
             this.form = res.data[0]
@@ -263,7 +263,7 @@ export default {
     },
     // 根据id删除当前列的数据
     del(id) {
-      assistanrApi.del(id).then(res => {
+      levelApi.del(id).then(res => {
         if (res.msg === 'success') {
           this.$refs.tree.remove(id)
           // 重新拉取右侧表格数据

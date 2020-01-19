@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-const base_uri = '/assistant/level'
+const base_uri = '/assistant/assi'
 
 // 获取所有分类
 function getLevel() {

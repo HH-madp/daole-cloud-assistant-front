@@ -38,17 +38,32 @@ export const constantRouterMap = [
   },
 
   {
-    path: '/assistant',
+    path: '/asType',
     component: Layout,
-    redirect: '/assistant',
-    // name: '手册编辑',
-    meta: { title: '手册编辑', icon: 'user' },
+    redirect: '/asType',
+    // name: '手册分类',
+    meta: { title: '手册分类', icon: 'user' },
     children: [
       {
-        path: 'manual',
-        name: 'manual',
-        component: () => import('@/views/manual/index'),
-        meta: { title: '手册编辑', icon: 'table' }
+        path: 'level',
+        name: 'level',
+        component: () => import('@/views/level/index'),
+        meta: { title: '手册分类', icon: 'table' }
+      }
+    ]
+  },
+  {
+    path: '/asCon',
+    component: Layout,
+    redirect: '/asCon',
+    // name: '手册分类',
+    meta: { title: '手册内容', icon: 'user' },
+    children: [
+      {
+        path: 'level',
+        name: 'level',
+        component: () => import('@/views/assistant/index'),
+        meta: { title: '手册内容', icon: 'table' }
       }
     ]
   },
