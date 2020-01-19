@@ -26,19 +26,15 @@
         style="width: 100%">
         <el-table-column label="序号" type="index" width="180"/>
         <el-table-column
-          prop="name"
+          prop="title"
           label="菜单名称"
-          width="260"/>
-        <el-table-column
-          prop="parentId"
-          label="菜单分级"
           width="260"/>
         <el-table-column
           prop="address"
           label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="small" @click="createChildLevel(scope.row.id)">创建子级菜单</el-button>
-            <el-button type="primary" size="small" @click="get(scope.row.id)">编辑</el-button>
+            <el-button type="primary" size="small" @click="createChildLevel(scope.row.id)">查看</el-button>
+            <el-button type="primary" size="small" @click="updateAssistant(scope.row.id)">编辑</el-button>
             <el-button type="primary" size="small" @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -57,7 +53,7 @@
   </div>
 </template>
 <script>
-import assistanrApi from '@/api/assistant'
+import assistantApi from '@/api/assistant'
 import assistantEdit from './assistantEdit'
 import levelApi from '@/api/level'
 
@@ -99,8 +95,8 @@ export default {
   created() {
     // 左侧树结构获取所有树数据
     this.getLevels()
-    // 右侧表格，初始化页面后默认获取一级菜单数据
-    // this.getLevelsByParentId(this.pageData.pagenum, this.pageData.pagesize, this.parentId)
+    // 右侧表格，获取手册信息
+    this.handquery(this.pageData.pagenum, this.pageData.pagesize, this.levelId)
   },
   methods: {
     // 树的过滤
@@ -112,8 +108,6 @@ export default {
     treeCheck(data) {
       // 选择单选框创建子集菜单时，form表单的parentId为当前选择项的id
       this.levelId = data.id
-      // 选择单选框,查询改菜单下的子集菜单，查询方法中的parentId为当前选择项的id
-      // this.getLevelsByParentId(this.pageData.pagenum, this.pageData.pagesize, data.id)
     },
     // 获取所有节点信息
     getLevels() {
@@ -123,10 +117,9 @@ export default {
         }
       })
     },
-
-    // 分页按钮点击事件
-    handlePageNumChange(val) {
-      assistanrApi.getLevelByParentId(val, this.pageData.pagesize, 0).then(res => {
+    // 获取右侧手册表格数据列表
+    handquery(pageNum = 0, pageSize = 10, leId) {
+      assistantApi.queryByPage(pageNum, pageSize, leId).then(res => {
         if (res.msg === 'success') {
           this.pageData.datalist = res.data.records
           this.pageData.pagenum = res.data.pages
@@ -136,24 +129,15 @@ export default {
         }
       })
     },
-    // 一级菜单保存数据
-    handleSave() {
-      assistanrApi.save(this.form).then(res => {
+    // 分页按钮点击事件
+    handlePageNumChange(val) {
+      assistantApi.getLevelByParentId(val, this.pageData.pagesize, 0).then(res => {
         if (res.msg === 'success') {
-          this.$notify({
-            title: '成功',
-            message: '保存成功',
-            type: 'success',
-            duration: 2000
-          })
-          this.dialogFormVisible = false
-          this.resetEditFormData()
-          // 一级菜单添加成功后，左侧树拉取新的数据
-          this.getLevels()
-          // 一级菜单添加成功后，右侧表格拉取新的一级菜单数据
-          this.getLevelsByParentId(0, 10, 0)
+          this.pageData.datalist = res.data.records
+          this.pageData.pagenum = res.data.pages
+          this.pageData.totalelements = res.data.total
         } else {
-          this.$message.error('创建失败')
+          this.$message.error('查询失败')
         }
       })
     },
@@ -161,11 +145,32 @@ export default {
     createAssistant() {
       this.$refs['assistantEdit'].handleCreate(this.levelId)
     },
-    // 根据id获取当前列的数据
-    get(id) {
+    // 编辑手册点击方法
+    updateAssistant(id) {
+      this.$refs['assistantEdit'].handleUpdate(id)
     },
     // 根据id删除当前列的数据
     del(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        assistantApi.del(id).then(res => {
+          if (res.msg === 'success') {
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+            this.handquery(this.pageData.pagenum, this.pageData.pagesize, this.levelId)
+          } else {
+            this.$message.error('删除失败')
+          }
+        })
+      }).catch(() => {
+      })
     }
   }
 }

@@ -13,6 +13,14 @@ function getLevelByParentId(pageNum, pageSize, parentId) {
     parentId: parentId
   })
 }
+// 根据节点id获取节点下的的手册信息
+function queryByPage(pageNum, pageSize, leId) {
+  return request.post(base_uri + '/query', {
+    pageNum: pageNum,
+    pageSize: pageSize,
+    leId: leId
+  })
+}
 //  根据id获取数据
 function get(id) {
   return request.post(base_uri + '/get', {
@@ -41,5 +49,6 @@ export default {
   save,
   getLevelByParentId,
   get,
-  del
+  del,
+  queryByPage
 }

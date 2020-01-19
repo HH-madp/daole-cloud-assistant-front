@@ -41,13 +41,28 @@ export default {
       this.editFormVisible = visible
     },
     // 处理新建
-    handleCreate(levelId, title = '新建手册') {
+    handleCreate(levelId, title = '新建手册信息') {
       if (levelId === undefined || levelId === '') {
         this.$message.error('新建手册前请选择分类')
         return
       } else {
         this.editFormData.leId = levelId
       }
+      this.title = title
+      this.show()
+    },
+    // 处理新建
+    handleUpdate(id, title = '编辑手册信息') {
+      assistantApi.get(id).then(res => {
+        if (res.msg === 'success') {
+          this.editFormData = res.data
+          // 为富文本框赋值
+          this.$refs['ueditcontent'].setContent(res.data.content)
+          this.show(true)
+        } else {
+          this.$message.error('保存失败')
+        }
+      })
       this.title = title
       this.show()
     },
