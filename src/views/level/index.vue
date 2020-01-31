@@ -14,11 +14,12 @@
         node-key="id"
         style="margin-top: 10px"
         class="filter-tree"
-        @node-expand="treeCheck"/>
+        @node-click="treeCheck"/>
     </div>
     <div class="rightContant">
       <!--创建子级按钮区-->
       <div class="y_title">
+        <el-button type="primary" size="mini" @click="getlevel">查询一级菜单</el-button>
         <el-button type="primary" size="mini" @click="openLevelDialog">创建一级菜单</el-button>
       </div>
       <el-table
@@ -141,6 +142,8 @@ export default {
     },
     // 树的点击事件
     treeCheck(data) {
+      // 删除成功后，按当前树的节点查询节点下的分类
+      this.parentId = data.id
       // 选择单选框创建子集菜单时，form表单的parentId为当前选择项的id
       this.form.parentId = data.id
       // 选择单选框,查询改菜单下的子集菜单，查询方法中的parentId为当前选择项的id
@@ -157,6 +160,18 @@ export default {
     // 根据父节点id获取该节点下的菜单数据
     getLevelsByParentId(pageNum, pageSize, parentId) {
       levelApi.getLevelByParentId(pageNum, pageSize, parentId).then(res => {
+        if (res.msg === 'success') {
+          this.pageData.datalist = res.data.records
+          this.pageData.pagenum = res.data.current
+          this.pageData.totalelements = res.data.total
+        } else {
+          this.$message.error('查询失败')
+        }
+      })
+    },
+    // 查询一级菜单按钮点击事件
+    getlevel() {
+      levelApi.getLevelByParentId(0, 10, 0).then(res => {
         if (res.msg === 'success') {
           this.pageData.datalist = res.data.records
           this.pageData.pagenum = res.data.current
@@ -263,20 +278,27 @@ export default {
     },
     // 根据id删除当前列的数据
     del(id) {
-      levelApi.del(id).then(res => {
-        if (res.msg === 'success') {
-          this.$refs.tree.remove(id)
-          // 重新拉取右侧表格数据
-          this.getLevelsByParentId(this.pageData.pagenum, this.pageData.pagesize, this.parentId)
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-          })
-        } else {
-          this.$message.error(res.msg)
-        }
+      this.$confirm('此操作将删除该分类下的所有手册, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        levelApi.del(id).then(res => {
+          if (res.msg === 'success') {
+            this.$refs.tree.remove(id)
+            // 重新拉取右侧表格数据
+            this.getLevelsByParentId(this.pageData.pagenum, this.pageData.pagesize, this.parentId)
+            this.$notify({
+              title: '成功',
+              message: '删除成功',
+              type: 'success',
+              duration: 2000
+            })
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+      }).catch(() => {
       })
     }
   }

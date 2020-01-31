@@ -33,7 +33,7 @@
           prop="address"
           label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="small" @click="createChildLevel(scope.row.id)">查看</el-button>
+            <el-button type="primary" size="small" @click="viewAssistant(scope.row.id)">查看</el-button>
             <el-button type="primary" size="small" @click="updateAssistant(scope.row.id)">编辑</el-button>
             <el-button type="primary" size="small" @click="del(scope.row.id)">删除</el-button>
           </template>
@@ -48,18 +48,21 @@
           @current-change="handlePageNumChange"
         />
       </div>
-      <assistant-edit ref="assistantEdit"/>
+      <assistant-edit ref="assistantEdit" @success="handquery"/>
+      <assistant-view ref="assistantView"/>
     </div>
   </div>
 </template>
 <script>
 import assistantApi from '@/api/assistant'
 import assistantEdit from './assistantEdit'
+import assistantView from './assistantView'
 import levelApi from '@/api/level'
 
 export default {
   components: {
-    assistantEdit
+    assistantEdit,
+    assistantView
   },
   data() {
     return {
@@ -71,7 +74,10 @@ export default {
       dialogFormVisible: false,
       // 创建子级菜单弹出框是否展示
       dialogChileFormVisible: false,
+      // 手册分类id
       levelId: '',
+      // 手册分类名称
+      levelName: '',
       // 分页数据
       pageData: {
         datalist: [],
@@ -108,6 +114,9 @@ export default {
     treeCheck(data) {
       // 选择单选框创建子集菜单时，form表单的parentId为当前选择项的id
       this.levelId = data.id
+      this.levelName = data.label
+      // 右侧表格，获取手册信息
+      this.handquery(0, 10, this.levelId)
     },
     // 获取所有节点信息
     getLevels() {
@@ -143,7 +152,11 @@ export default {
     },
     // 创建手册点击方法
     createAssistant() {
-      this.$refs['assistantEdit'].handleCreate(this.levelId)
+      this.$refs['assistantEdit'].handleCreate(this.levelId, this.levelName)
+    },
+    // 查看手册点击方法
+    viewAssistant(id) {
+      this.$refs['assistantView'].handleUpdate(id)
     },
     // 编辑手册点击方法
     updateAssistant(id) {

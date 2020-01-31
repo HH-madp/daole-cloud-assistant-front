@@ -6,7 +6,7 @@
           <el-input v-model="editFormData.title" maxlength="40" placeholder="40字以内"/>
         </el-form-item>
         <el-form-item label="手册内容" prop="content">
-          <ueditor ref="ueditcontent" :content="editFormData.content" v-model="editFormData.content"/>
+          <ueditor ref="ueditcontent" v-model="editFormData.content"/>
         </el-form-item>-
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -41,23 +41,24 @@ export default {
       this.editFormVisible = visible
     },
     // 处理新建
-    handleCreate(levelId, title = '新建手册信息') {
+    handleCreate(levelId, leName, title = '新建手册信息') {
       if (levelId === undefined || levelId === '') {
         this.$message.error('新建手册前请选择分类')
         return
       } else {
         this.editFormData.leId = levelId
+        this.editFormData.leName = leName
       }
       this.title = title
       this.show()
     },
-    // 处理新建
+    // 处理更新
     handleUpdate(id, title = '编辑手册信息') {
       assistantApi.get(id).then(res => {
         if (res.msg === 'success') {
           this.editFormData = res.data
           // 为富文本框赋值
-          this.$refs['ueditcontent'].setContent(res.data.content)
+          // this.$refs['ueditcontent'].setContent(res.data.content)
           this.show(true)
         } else {
           this.$message.error('保存失败')
@@ -79,7 +80,10 @@ export default {
             type: 'success',
             duration: 2000
           })
+          this.$emit('success', 0, 10, this.editFormData.leId)
           this.show(false)
+          this.editFormData = {}
+          this.$refs['ueditcontent'].setContent('')
         } else {
           this.$message.error('保存失败')
         }
