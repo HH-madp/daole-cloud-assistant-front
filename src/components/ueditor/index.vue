@@ -64,10 +64,10 @@ export default {
     // 初始化UE
     // eslint-disable-next-line no-undef
     this.editor = UE.getEditor(this.id, config)
-    this.editor.addListener('ready', () => {
-      // 确保UE加载完成后，放入内容。
-      this.editor.setContent(this.content)
-    })
+    // this.editor.addListener('ready', () => {
+    // 确保UE加载完成后，放入内容。
+    // this.editor.setContent(this.content)
+    // })
   },
   destroyed() {
     this.editor.destory()

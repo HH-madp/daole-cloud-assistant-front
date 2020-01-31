@@ -58,7 +58,7 @@ export default {
         if (res.msg === 'success') {
           this.editFormData = res.data
           // 为富文本框赋值
-          // this.$refs['ueditcontent'].setContent(res.data.content)
+          this.$refs['ueditcontent'].setContent(res.data.content)
           this.show(true)
         } else {
           this.$message.error('保存失败')
